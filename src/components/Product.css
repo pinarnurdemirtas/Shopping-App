@@ -1,0 +1,24 @@
+.product-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between; /* Kartlar arasındaki boşluğu minimize etmek için */
+    margin: 10px 0;
+    
+}
+
+.product-container > div {
+    margin: 5px; /* Kartların etrafındaki boşluğu azaltmak için */
+    flex: 1 0 22%; /* Kartların genişliği, 4 kart için ayarlanmıştır */
+}
+
+@media (max-width: 768px) {
+    .product-container > div {
+        flex: 1 0 45%; /* Tablet ve mobil cihazlar için kart genişliği */
+    }
+}
+
+@media (max-width: 480px) {
+    .product-container > div {
+        flex: 1 0 90%; /* Küçük ekranlar için kart genişliği */
+    }
+}
