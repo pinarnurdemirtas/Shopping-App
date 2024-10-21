@@ -1,11 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Drawer, Button, List, Typography, Divider } from 'antd';  
 import Header from './Header';
-import products from '../products.json';
+import axios from 'axios'; // axios'u ekleyin
 
 const { Title } = Typography;
 
 function BasketDrawer({ drawerVisible, onClose, basket, total, money, setMoney, resetBasket }) {
+  const [products, setProducts] = useState([]); // Ürünleri tutmak için state
+
+  // API'den ürünleri çek
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get('https://localhost:44373/api/Products');
+        setProducts(response.data); // Ürünleri state'e ata
+      } catch (error) {
+        console.error('Ürünleri çekerken hata:', error);
+      }
+    };
+
+    fetchProducts(); // Ürünleri çek
+  }, []);
+
   return (
     <Drawer
       title="Sepet"
@@ -24,21 +40,23 @@ function BasketDrawer({ drawerVisible, onClose, basket, total, money, setMoney, 
       <List
         dataSource={basket}
         renderItem={item => {
-          const product = products.find(p => p.id === item.id);
+          const product = products.find(p => p.id === item.id); // API'den alınan ürünleri kullan
           return (
             <List.Item style={{ justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <img
-                  src={product.img}
-                  alt={product.name}
-                  style={{ width: 50, height: 50, marginRight: 10, objectFit: 'cover' }}
-                />
+                {product && ( // Eğer ürün varsa resmi göster
+                  <img
+                    src={product.img}
+                    alt={product.title}
+                    style={{ width: 50, height: 50, marginRight: 10, objectFit: 'cover' }}
+                  />
+                )}
                 <div>
-                  <strong>{product.name}</strong> - {item.amount} x {product.title}
+                  <strong>{product ? product.title : 'Ürün Bulunamadı'}</strong> - {item.amount} x {product ? product.price : 0} TL
                 </div>
               </div>
               <div>
-                <strong>{(item.amount * product.price).toFixed(2)} TL</strong>
+                <strong>{(item.amount * (product ? product.price : 0)).toFixed(2)} TL</strong>
               </div>
             </List.Item>
           );

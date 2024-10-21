@@ -4,7 +4,7 @@ import { Layout, Menu, Badge, Drawer, Button } from 'antd';
 import { ShoppingCartOutlined, MenuOutlined } from '@ant-design/icons';
 import Product from './components/Product';
 import BasketDrawer from './components/BasketDrawer';
-import products from './products.json';
+import axios from 'axios'; // axios'u ekleyin
 import 'antd/dist/reset.css';
 
 const { Header, Content } = Layout;
@@ -16,10 +16,26 @@ function App() {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [menuDrawerVisible, setMenuDrawerVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [products, setProducts] = useState([]); // Ürünleri tutmak için state
 
   const resetBasket = () => {
     setBasket([]);
   };
+
+  useEffect(() => {
+    // API'den ürünleri çek
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get('https://localhost:44373/api/Products');
+        console.log('Ürünler:', response.data); // Yanıtı logla
+        setProducts(response.data); // Ürünleri state'e ata
+      } catch (error) {
+        console.error('Ürünleri çekerken hata:', error);
+      }
+    };
+
+    fetchProducts(); // Ürünleri çek
+  }, []);
 
   useEffect(() => {
     setTotal(
@@ -29,7 +45,7 @@ function App() {
         );
       }, 0)
     );
-  }, [basket]);
+  }, [basket, products]); // Ürünleri bağımlılık olarak ekle
 
   useEffect(() => {
     if (basket.length > 0) {
@@ -47,7 +63,7 @@ function App() {
 
   const handleMenuClick = (e) => {
     setSelectedCategory(e.key);
-    setMenuDrawerVisible(false); // Mobilde menü seçimi yapıldıktan sonra menüyü kapatır
+    setMenuDrawerVisible(false); // Menü seçildikten sonra kapat
   };
 
   const toggleMenuDrawer = () => {
@@ -61,7 +77,7 @@ function App() {
 
   return (
     <Layout>
-      <Header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+      <Header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Button 
           type="text" 
           icon={<MenuOutlined style={{ color: '#fff', fontSize: '24px' }} />} 
